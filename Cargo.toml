@@ -1,0 +1,29 @@
+[package]
+authors = ["Haze Booth <isnt@haze.cool>"]
+edition = "2018"
+name = "kpp"
+version = "0.1.0"
+
+[dependencies]
+# rand = "0.7.3"
+log = "*"
+pretty_env_logger = "*"
+threadpool = "1.8.1"
+serde_json = "1.0.53"
+redis = "0.16.0"
+
+[dependencies.serde]
+features = ["derive"]
+version = "1.0.111"
+
+[dependencies.surf]
+git = "https://github.com/http-rs/surf"
+
+[dependencies.tokio]
+features = ["macros", "rt-core", "rt-threaded"]
+version = "0.2.21"
+
+[dependencies.serenity]
+path = "/Users/haze/tmp/serenity"
+default-features = false
+features = ["builder", "cache", "client", "gateway", "http", "model", "absolute_ratelimits", "native_tls_backend"]
