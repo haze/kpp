@@ -105,7 +105,7 @@ pub struct Child {
     pub author_flair_css_class: Option<String>,
     pub gildings: Gildings,
     #[serde(rename = "post_hint")]
-    pub post_hint: String,
+    pub post_hint: Option<String>,
     #[serde(rename = "is_self")]
     pub is_self: bool,
     #[serde(rename = "mod_note")]
@@ -126,7 +126,7 @@ pub struct Child {
     pub pinned: bool,
     #[serde(rename = "over_18")]
     pub over18: bool,
-    pub preview: Preview,
+    pub preview: Option<Preview>,
     #[serde(rename = "media_only")]
     pub media_only: bool,
     #[serde(rename = "link_flair_template_id")]
@@ -149,7 +149,7 @@ pub struct Child {
     #[serde(rename = "send_replies")]
     pub send_replies: bool,
     #[serde(rename = "whitelist_status")]
-    pub whitelist_status: String,
+    pub whitelist_status: Option<String>,
     #[serde(rename = "contest_mode")]
     pub contest_mode: bool,
     #[serde(rename = "author_patreon_flair")]
@@ -158,7 +158,7 @@ pub struct Child {
     pub author_flair_text_color: Option<String>,
     pub permalink: String,
     #[serde(rename = "parent_whitelist_status")]
-    pub parent_whitelist_status: String,
+    pub parent_whitelist_status: Option<String>,
     pub stickied: bool,
     pub url: String,
     #[serde(rename = "subreddit_subscribers")]

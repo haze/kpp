@@ -15,29 +15,38 @@ impl EventHandler for Handler {
         ctx: serenity::prelude::Context,
         mut new_message: serenity::model::channel::Message,
     ) {
-        if new_message.author.id == OWNER_ID && new_message.content == "kpp" {
-            let found_time = std::time::Instant::now();
-            if let Some(redis_connection) = ctx.data.read().await.get::<RedisTypemapKey>() {
-                let mut conn = redis_connection.lock().await;
-                if let Ok(Some(kpop_pic_url)) = random_kpop_pic(&mut conn, Some(100)).await {
-                    println!("Found kpop pic after {:?}", found_time.elapsed());
-                    if let Err(why) = new_message
-                        .edit(&ctx.http, |m| {
-                            m.content(kpop_pic_url);
-                            m
-                        })
-                        .await
-                    {
-                        eprintln!("Failed to edit message: {:?}", &why);
-                        return;
+        if new_message.author.id == OWNER_ID {
+            if let Some(subreddit) = match &*new_message.content {
+                "kpp" => Some("kpics"),
+                "kpg" => Some("kpopgfys"),
+                _ => None,
+            } {
+                let found_time = std::time::Instant::now();
+                if let Some(redis_connection) = ctx.data.read().await.get::<RedisTypemapKey>() {
+                    let mut conn = redis_connection.lock().await;
+                    match random_subreddit_media(&mut conn, subreddit, Some(100)).await {
+                        Ok(Some(kpop_pic_url)) => {
+                            println!("Found kpop pic after {:?}", found_time.elapsed());
+                            if let Err(why) = new_message
+                                .edit(&ctx.http, |m| {
+                                    m.content(kpop_pic_url);
+                                    m
+                                })
+                                .await
+                            {
+                                eprintln!("Failed to edit message: {:?}", &why);
+                                return;
+                            }
+                            println!("Edited message after {:?}", found_time.elapsed());
+                        }
+                        Ok(None) => eprintln!("Could nto find kpop media"),
+                        Err(why) => eprintln!("Failed to get kpop media {:?}", &why),
                     }
-                    println!("Edited message after {:?}", found_time.elapsed());
                 }
             }
         }
     }
 }
-impl RawEventHandler for Handler {}
 
 struct RedisTypemapKey;
 impl serenity::prelude::TypeMapKey for RedisTypemapKey {
@@ -128,8 +137,9 @@ async fn get_reddit_posts(
         .recv_json().await.map_err(|e| e.into())
 }
 
-async fn random_kpop_pic(
+async fn random_subreddit_media(
     redis_connection: &mut redis::aio::Connection,
+    subreddit: &str,
     max_number_of_pages: Option<usize>,
 ) -> Result<Option<String>, Box<dyn std::error::Error + Send + Sync>> {
     let start_time = std::time::Instant::now();
@@ -144,7 +154,7 @@ async fn random_kpop_pic(
         }
 
         let root =
-            get_reddit_posts("kpics", reddit::Selector::New, Some(25), after.as_deref()).await?;
+            get_reddit_posts(subreddit, reddit::Selector::New, Some(25), after.as_deref()).await?;
         println!(
             "got reddit page {} data after {:?}",
             pages_searched,
