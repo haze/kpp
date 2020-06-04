@@ -24,6 +24,8 @@ features = ["macros", "rt-core", "rt-threaded"]
 version = "0.2.21"
 
 [dependencies.serenity]
-path = "/Users/haze/tmp/serenity"
+# path = "/Users/haze/tmp/serenity"
+git = "https://github.com/haze/serenity"
+branch = "await"
 default-features = false
 features = ["builder", "cache", "client", "gateway", "http", "model", "absolute_ratelimits", "native_tls_backend"]
